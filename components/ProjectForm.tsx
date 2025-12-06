@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Category, Country, ExpenseType, Project, Status, Role, PlanningRow, FinanceSchedule, Comment, User } from '../types';
 import { CONCESSIONS, CATEGORIES, SUBCATEGORIES, INITIAL_PLANNING_ROW, INITIAL_FINANCE_SCHEDULE, STATUS_COLORS, AVAILABLE_USERS } from '../constants';
-import { Save, Send, CheckCircle, XCircle, ArrowLeft, MessageSquare, History, FileText, Calendar, DollarSign, Undo2, Lock, Unlock, AlertTriangle, Plus, Trash2, FileDown, Wallet, CornerDownRight, CheckSquare, AlertCircle } from 'lucide-react';
+import { Save, Send, CheckCircle, XCircle, ArrowLeft, MessageSquare, History, FileText, Calendar, DollarSign, Undo2, Lock, Unlock, AlertTriangle, Plus, Trash2, FileDown, Wallet, CornerDownRight, CheckSquare, AlertCircle, Info, Users, Tag, Globe, Clock, Briefcase } from 'lucide-react';
 import { generateUUID } from '../utils';
 
 const TABS = ['Details', 'Planning', 'Finance', 'Approval', 'Audit Trail', 'Comments'];
@@ -190,6 +190,19 @@ const getDecisionBorderColor = (text: string) => {
     if (text.includes('APPROVED')) return 'border-green-500';
     return 'border-blue-500';
 };
+
+// --- Section Card Component ---
+const SectionCard = ({ title, icon: Icon, children, className = '' }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string }) => (
+  <div className={`bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden ${className}`}>
+    <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-2">
+      <Icon size={18} className="text-slate-500 dark:text-slate-400" />
+      <h3 className="font-bold text-slate-700 dark:text-slate-200 text-sm uppercase tracking-wide">{title}</h3>
+    </div>
+    <div className="p-6">
+      {children}
+    </div>
+  </div>
+);
 
 export const ProjectForm = () => {
   const { id } = useParams();
@@ -460,15 +473,17 @@ export const ProjectForm = () => {
 
   const renderPlanningRow = (label: string, field: 'planEngineering' | 'planProcurement' | 'planExecution') => (
     <tr className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-      <td className="py-4 font-medium text-slate-700 dark:text-slate-300">{label}</td>
+      <td className="py-4 font-medium text-slate-700 dark:text-slate-300 px-4">{label}</td>
       {['prior', 'q1', 'q2', 'q3', 'q4', 'subsequent'].map((period) => (
         <td key={period} className="text-center py-2">
-          <input 
-            type="checkbox" 
-            className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer dark:bg-slate-700 dark:border-slate-600"
-            checked={(formData[field] as any)[period]}
-            onChange={(e) => handleNestedChange(field, period, e.target.checked)}
-          />
+          <label className="inline-flex items-center justify-center cursor-pointer p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            <input 
+              type="checkbox" 
+              className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer dark:bg-slate-700 dark:border-slate-600"
+              checked={(formData[field] as any)[period]}
+              onChange={(e) => handleNestedChange(field, period, e.target.checked)}
+            />
+          </label>
         </td>
       ))}
     </tr>
@@ -556,7 +571,7 @@ export const ProjectForm = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className={`bg-white dark:bg-slate-900 ${isPrinting ? 'p-0' : 'rounded-b-lg border border-slate-200 dark:border-slate-800 border-t-0 p-8 md:p-12 shadow-sm min-h-[600px] transition-colors'}`}>
+      <div className={`bg-slate-50 dark:bg-slate-950/50 ${isPrinting ? 'p-0' : 'rounded-b-lg border border-slate-200 dark:border-slate-800 border-t-0 p-6 md:p-8 shadow-sm min-h-[600px] transition-colors'}`}>
         
         {/* PRINT HEADER */}
         {isPrinting && (
@@ -574,187 +589,235 @@ export const ProjectForm = () => {
         {/* DETAILS TAB */}
         <div className={activeTab === 'Details' || isPrinting ? 'block' : 'hidden'}>
           {isPrinting && <h2 className="text-xl font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3">Project Details</h2>}
-          <div className="space-y-10 animate-in fade-in duration-300">
-            {/* Project Code Banner - Hide in print if it's just info */}
+          <div className="space-y-6 animate-in fade-in duration-300">
+            
+            {/* Quick Stats Bar */}
             {!isPrinting && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4 flex items-start gap-3">
-                <AlertTriangle className="text-blue-500 shrink-0 mt-0.5" size={18} />
-                <div className="flex-1">
-                  <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300">Project Code Generation</h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
-                      This project code is auto-generated based on the selected <strong>Country</strong> and <strong>Start Date</strong> to ensure consistency. 
-                      {formData.manualCodeOverride ? 
-                        <span className="font-bold text-red-600 dark:text-red-400 block mt-1">Manual Override Active: You have chosen to bypass the automatic naming convention.</span> : 
-                        ' Manual override is available if strictly necessary.'}
-                  </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-lg flex items-center justify-between shadow-sm">
+                   <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Total Lifecycle Cost</p>
+                      <p className="text-lg font-mono font-bold text-slate-800 dark:text-slate-100">{totalProjectCost.toLocaleString()} kUSD</p>
+                   </div>
+                   <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">
+                      <Wallet size={20} />
+                   </div>
+                </div>
+                <div className="bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900 p-4 rounded-lg flex items-center justify-between shadow-sm relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
+                   <div>
+                      <p className="text-xs text-blue-500 dark:text-blue-400 uppercase font-semibold">Budget Year {formData.budgetYear}</p>
+                      <p className="text-lg font-mono font-bold text-blue-700 dark:text-blue-300">{proposedBudgetGross.toLocaleString()} kUSD</p>
+                   </div>
+                   <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400">
+                      <DollarSign size={20} />
+                   </div>
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {renderSelect('Country', 'country', Object.values(Country).map(c => ({label: c, value: c})))}
-              {renderSelect('Concession', 'concession', (CONCESSIONS[formData.country] || []).map(c => ({label: c, value: c})))}
-              {renderInput('Start Date', 'startDate', 'date', true)}
-              {renderInput('End Date', 'endDate', 'date')}
-              
-              <div className="lg:col-span-2">
-                 <div className="flex flex-col gap-2 relative">
-                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Code {formData.manualCodeOverride ? '(Manual)' : '(Auto)'}</label>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="text" 
-                        disabled={!formData.manualCodeOverride}
-                        className={`w-full border border-slate-300 dark:border-slate-700 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white ${!formData.manualCodeOverride ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400' : 'bg-white dark:bg-slate-950'}`}
-                        value={formData.code}
-                        onChange={(e) => handleChange('code', e.target.value)}
-                      />
-                      {!isPrinting && !formData.manualCodeOverride && (
-                         <button onClick={handleUnlockCode} className="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Unlock for Manual Override">
-                           <Lock size={18} />
-                         </button>
-                      )}
-                      {!isPrinting && formData.manualCodeOverride && (
-                         <button onClick={() => handleChange('manualCodeOverride', false)} className="p-2 text-red-600 hover:text-green-600 transition-colors" title="Revert to Auto">
-                           <Unlock size={18} />
-                         </button>
-                      )}
+            {/* Section 1: Identity (Full Width) */}
+            <SectionCard title="Project Identity" icon={Info}>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                    <div className="lg:col-span-2">
+                        {renderInput('Project Name', 'name', 'text', true)}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Code {formData.manualCodeOverride ? '(Manual)' : '(Auto)'}</label>
+                        <div className="flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                disabled={!formData.manualCodeOverride}
+                                className={`w-full border border-slate-300 dark:border-slate-700 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white ${!formData.manualCodeOverride ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400' : 'bg-white dark:bg-slate-950'}`}
+                                value={formData.code}
+                                onChange={(e) => handleChange('code', e.target.value)}
+                            />
+                            {!isPrinting && !formData.manualCodeOverride && (
+                                <button onClick={handleUnlockCode} className="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Unlock for Manual Override">
+                                <Lock size={18} />
+                                </button>
+                            )}
+                            {!isPrinting && formData.manualCodeOverride && (
+                                <button onClick={() => handleChange('manualCodeOverride', false)} className="p-2 text-red-600 hover:text-green-600 transition-colors" title="Revert to Auto">
+                                <Unlock size={18} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    {renderInput('Budget Year', 'budgetYear', 'number', true)}
+                </div>
+            </SectionCard>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Section 2: Operational Context */}
+                <SectionCard title="Operational Context" icon={Globe} className="h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {renderSelect('Country', 'country', Object.values(Country).map(c => ({label: c, value: c})))}
+                        {renderSelect('Concession', 'concession', (CONCESSIONS[formData.country] || []).map(c => ({label: c, value: c})))}
+                        {renderInput('Start Date', 'startDate', 'date', true)}
+                        {renderInput('End Date', 'endDate', 'date')}
+                    </div>
+                </SectionCard>
+
+                {/* Section 3: Strategic Classification */}
+                <SectionCard title="Strategic Classification" icon={Tag} className="h-full">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        {renderSelect('Category', 'category', CATEGORIES.map(c => ({label: c, value: c})))}
+                        {renderSelect('Subcategory', 'subcategory', SUBCATEGORIES.map(c => ({label: c, value: c})))}
+                        {renderSelect('Expense Type', 'expenseType', Object.values(ExpenseType).map(e => ({label: e, value: e})))}
+                        {renderSelect('Priority', 'priority', priorityOptions)}
+                     </div>
+                     <div className="flex flex-col sm:flex-row gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        {renderSelect('Execution Mode', 'multiYear', [{label: 'Single Year', value: 'Single'}, {label: 'Multi Year', value: 'Multi'}])}
+                        
+                         {/* Additional Reserves Toggle */}
+                        <div className="flex flex-col gap-2 flex-1">
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adds Reserves/Production?</label>
+                            <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded p-1 w-full gap-1">
+                                <button 
+                                    className={`flex-1 px-4 py-2.5 text-xs font-medium rounded transition-all ${formData.additionalReserves ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                    onClick={() => handleChange('additionalReserves', true)}
+                                >
+                                    Yes
+                                </button>
+                                <button 
+                                    className={`flex-1 px-4 py-2.5 text-xs font-medium rounded transition-all ${!formData.additionalReserves ? 'bg-slate-600 dark:bg-slate-700 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                    onClick={() => handleChange('additionalReserves', false)}
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                     </div>
+                </SectionCard>
+            </div>
+
+            {/* Section 4: Stakeholders */}
+            <SectionCard title="Stakeholders" icon={Users}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     {/* Owner Field */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Owner *</label>
+                        <select 
+                        className="border border-slate-300 dark:border-slate-700 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-slate-950 dark:text-white"
+                        value={formData.owner}
+                        onChange={(e) => handleChange('owner', e.target.value)}
+                        >
+                        {AVAILABLE_USERS.map(user => <option key={user} value={user}>{user}</option>)}
+                        </select>
+                    </div>
+
+                    {/* Reviewers Field */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Reviewers</label>
+                        <div className="border border-slate-300 dark:border-slate-700 rounded p-3 min-h-[46px] flex flex-wrap gap-2 items-center bg-white dark:bg-slate-950">
+                            {formData.reviewers.map(r => (
+                            <span key={r} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium px-2 py-1 rounded flex items-center gap-1 border border-slate-200 dark:border-slate-700">
+                                {r}
+                                {!isPrinting && <button onClick={() => handleRemoveReviewer(r)} className="text-slate-400 hover:text-red-500"><XCircle size={14}/></button>}
+                            </span>
+                            ))}
+                            {!isPrinting && (
+                            <div className="relative group">
+                                <button className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase hover:text-blue-800 dark:hover:text-blue-300">
+                                    <Plus size={14} /> Add
+                                </button>
+                                <select 
+                                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                                    onChange={handleAddReviewer}
+                                    value=""
+                                >
+                                <option value="">Select User...</option>
+                                {AVAILABLE_USERS.filter(u => u !== formData.owner && !formData.reviewers.includes(u)).map(u => (
+                                    <option key={u} value={u}>{u}</option>
+                                ))}
+                                </select>
+                            </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </SectionCard>
+
+            {/* Section 5: Business Case */}
+            <SectionCard title="Business Case Definition" icon={Briefcase}>
+                 <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Scope / Description</label>
+                        <textarea 
+                            className="w-full border border-slate-300 dark:border-slate-700 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-slate-950 dark:text-white min-h-[160px] resize-y"
+                            value={formData.description}
+                            onChange={(e) => handleChange('description', e.target.value)}
+                            placeholder="Provide a detailed description of the project scope..."
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                         <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Justification / Benefit</label>
+                        <textarea 
+                            className="w-full border border-slate-300 dark:border-slate-700 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-slate-950 dark:text-white min-h-[160px] resize-y"
+                            value={formData.justification}
+                            onChange={(e) => handleChange('justification', e.target.value)}
+                            placeholder="Explain the business case, background, and necessity of this project..."
+                        />
                     </div>
                  </div>
-              </div>
+            </SectionCard>
 
-              <div className="lg:col-span-2">
-                {renderInput('Project Name', 'name', 'text', true)}
-              </div>
-              
-              {renderSelect('Category', 'category', CATEGORIES.map(c => ({label: c, value: c})))}
-              {renderSelect('Subcategory', 'subcategory', SUBCATEGORIES.map(c => ({label: c, value: c})))}
-              {renderSelect('Priority', 'priority', priorityOptions)}
-              {renderInput('Budget Year', 'budgetYear', 'number', true)}
-              
-              {/* Owner Field */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Owner *</label>
-                <select 
-                  className="border border-slate-300 dark:border-slate-700 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-slate-950 dark:text-white"
-                  value={formData.owner}
-                  onChange={(e) => handleChange('owner', e.target.value)}
-                >
-                  {AVAILABLE_USERS.map(user => <option key={user} value={user}>{user}</option>)}
-                </select>
-              </div>
-
-               {/* Reviewers Field */}
-               <div className="lg:col-span-2 flex flex-col gap-2">
-                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Reviewers</label>
-                 <div className="border border-slate-300 dark:border-slate-700 rounded p-3 min-h-[46px] flex flex-wrap gap-2 items-center bg-white dark:bg-slate-950">
-                    {formData.reviewers.map(r => (
-                      <span key={r} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium px-2 py-1 rounded flex items-center gap-1 border border-slate-200 dark:border-slate-700">
-                        {r}
-                        {!isPrinting && <button onClick={() => handleRemoveReviewer(r)} className="text-slate-400 hover:text-red-500"><XCircle size={14}/></button>}
-                      </span>
-                    ))}
-                    {!isPrinting && (
-                      <div className="relative group">
-                        <button className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase hover:text-blue-800 dark:hover:text-blue-300">
-                            <Plus size={14} /> Add Reviewer
-                        </button>
-                        <select 
-                            className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                            onChange={handleAddReviewer}
-                            value=""
-                        >
-                          <option value="">Select User...</option>
-                          {AVAILABLE_USERS.filter(u => u !== formData.owner && !formData.reviewers.includes(u)).map(u => (
-                            <option key={u} value={u}>{u}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                 </div>
-               </div>
-              
-              {/* Additional production/reserves? toggle */}
-              <div className="flex flex-col gap-2">
-                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Additional production/reserves?</label>
-                 <div className="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded p-1 w-full sm:w-fit gap-1">
-                    <button 
-                       className={`flex-1 sm:flex-none px-6 py-2 text-xs font-medium rounded transition-all ${formData.additionalReserves ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                       onClick={() => handleChange('additionalReserves', true)}
-                    >
-                       Yes
-                    </button>
-                    <button 
-                       className={`flex-1 sm:flex-none px-6 py-2 text-xs font-medium rounded transition-all ${!formData.additionalReserves ? 'bg-slate-600 dark:bg-slate-700 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                       onClick={() => handleChange('additionalReserves', false)}
-                    >
-                       No
-                    </button>
-                 </div>
-              </div>
-
-              {renderSelect('Expense Type', 'expenseType', Object.values(ExpenseType).map(e => ({label: e, value: e})))}
-              {renderSelect('Single/Multi Year', 'multiYear', [{label: 'Single', value: 'Single'}, {label: 'Multi', value: 'Multi'}])}
-
-              {/* Read-Only Summary Fields */}
-              <div className="lg:col-span-2 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-lg border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-6">
-                  {renderInput('Total Project Cost (kUSD)', 'expenditures', 'text', false, true, totalProjectCost.toLocaleString())}
-                  {renderInput('Proposed Budget Year Gross (kUSD)', 'expenditures', 'text', false, true, proposedBudgetGross.toLocaleString())}
-              </div>
-            </div>
-
-            <div className="space-y-8">
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Description</label>
-                </div>
-                <div className="relative">
-                     <textarea 
-                      className="w-full border rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-950 dark:text-white min-h-[120px] transition-colors border-slate-300 dark:border-slate-700"
-                      value={formData.description}
-                      onChange={(e) => handleChange('description', e.target.value)}
-                      placeholder="Provide a detailed description of the project scope..."
-                    />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Justification / Background</label>
-                </div>
-                <textarea 
-                  className="w-full border rounded px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-950 dark:text-white min-h-[120px] transition-colors border-slate-300 dark:border-slate-700"
-                  value={formData.justification}
-                  onChange={(e) => handleChange('justification', e.target.value)}
-                  placeholder="Explain the business case, background, and necessity of this project..."
-                />
-              </div>
-            </div>
           </div>
         </div>
 
         {/* PLANNING TAB */}
         <div className={`${activeTab === 'Planning' || isPrinting ? 'block' : 'hidden'} ${isPrinting ? 'print-break-before mt-8' : ''}`}>
           {isPrinting && <h2 className="text-xl font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3">Planning & Schedule</h2>}
-          <div className="animate-in fade-in duration-300">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6">Project Schedule</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-y border-slate-200 dark:border-slate-700">
-                    <th className="text-left py-4 pl-4 uppercase text-xs tracking-wider">Activity</th>
-                    <th className="w-32 text-center uppercase text-xs tracking-wider">Prior</th>
-                    <th className="w-32 text-center uppercase text-xs tracking-wider">Q1</th>
-                    <th className="w-32 text-center uppercase text-xs tracking-wider">Q2</th>
-                    <th className="w-32 text-center uppercase text-xs tracking-wider">Q3</th>
-                    <th className="w-32 text-center uppercase text-xs tracking-wider">Q4</th>
-                    <th className="w-32 text-center uppercase text-xs tracking-wider">Subsequent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {renderPlanningRow('Engineering / Study', 'planEngineering')}
-                  {renderPlanningRow('Procurement / Fabrication', 'planProcurement')}
-                  {renderPlanningRow('Execution / Close-out', 'planExecution')}
-                </tbody>
-              </table>
+          <div className="animate-in fade-in duration-300 space-y-6">
+            
+            {/* Schedule Summary Banner */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                   <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">Project Phasing</h3>
+                   <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Select the active quarters for each project phase.</p>
+                </div>
+                <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded border border-slate-200 dark:border-slate-700">
+                        <Clock size={16} className="text-blue-500" />
+                        <span className="text-slate-500 dark:text-slate-400">Start:</span>
+                        <span className="font-bold text-slate-700 dark:text-slate-200">{formData.startDate ? new Date(formData.startDate).toLocaleDateString() : 'Not set'}</span>
+                    </div>
+                    <ArrowLeft size={16} className="text-slate-300 rotate-180" />
+                     <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded border border-slate-200 dark:border-slate-700">
+                        <Clock size={16} className="text-purple-500" />
+                        <span className="text-slate-500 dark:text-slate-400">End:</span>
+                        <span className="font-bold text-slate-700 dark:text-slate-200">{formData.endDate ? new Date(formData.endDate).toLocaleDateString() : 'Not set'}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                      <th className="text-left py-4 px-4 uppercase text-xs tracking-wider w-1/4">Activity / Phase</th>
+                      <th className="text-center py-4 uppercase text-xs tracking-wider bg-slate-100/50 dark:bg-slate-800/50">Prior</th>
+                      <th className="text-center py-4 uppercase text-xs tracking-wider">Q1</th>
+                      <th className="text-center py-4 uppercase text-xs tracking-wider">Q2</th>
+                      <th className="text-center py-4 uppercase text-xs tracking-wider">Q3</th>
+                      <th className="text-center py-4 uppercase text-xs tracking-wider">Q4</th>
+                      <th className="text-center py-4 uppercase text-xs tracking-wider bg-slate-100/50 dark:bg-slate-800/50">Subsequent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {renderPlanningRow('Engineering / Study', 'planEngineering')}
+                    {renderPlanningRow('Procurement / Fabrication', 'planProcurement')}
+                    {renderPlanningRow('Execution / Close-out', 'planExecution')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 text-xs text-slate-500 dark:text-slate-400 italic px-2">
+                <Info size={14} className="shrink-0 mt-0.5" />
+                <p>Ensure the phases align with the dates specified in the Details tab. Multi-year projects should utilize the 'Subsequent' column for activities extending beyond the current budget year.</p>
             </div>
           </div>
         </div>
@@ -766,7 +829,7 @@ export const ProjectForm = () => {
             
             {/* Top Meta Data */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
+               <div className="flex items-center gap-3 p-4 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
                  <input 
                    type="checkbox" 
                    id="initiated"
@@ -776,8 +839,12 @@ export const ProjectForm = () => {
                  />
                  <label htmlFor="initiated" className="text-sm font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Initiated before budget year?</label>
               </div>
-              {renderInput('Prev Budget Line Ref', 'prevBudgetRef')}
-              {renderInput('AFENav Reference', 'afeNavRef')}
+              <div className="bg-white dark:bg-slate-900 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                 {renderInput('Prev Budget Line Ref', 'prevBudgetRef')}
+              </div>
+              <div className="bg-white dark:bg-slate-900 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                {renderInput('AFENav Reference', 'afeNavRef')}
+              </div>
             </div>
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
@@ -841,7 +908,9 @@ export const ProjectForm = () => {
                <div className="opacity-75 pt-6 border-t border-slate-200 dark:border-slate-800">
                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6">Previous Budget Context</h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-                   {renderInput('Previous Total Project Cost (kUSD)', 'prevTotalCost', 'number')}
+                   <div className="bg-white dark:bg-slate-900 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                      {renderInput('Previous Total Project Cost (kUSD)', 'prevTotalCost', 'number')}
+                   </div>
                    <div className="hidden md:block"></div> {/* Spacer for grid */}
                  </div>
                  <div className="flex flex-col gap-2">
@@ -1006,7 +1075,7 @@ export const ProjectForm = () => {
         {/* AUDIT TAB - Only shown if active and not printing */}
         <div className={activeTab === 'Audit Trail' && !isPrinting ? 'block' : 'hidden'}>
           <div className="animate-in fade-in duration-300">
-            <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+            <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase font-semibold">
                   <tr>
@@ -1061,7 +1130,7 @@ export const ProjectForm = () => {
               ))}
               
               {formData.comments.length === 0 && (
-                <div className="text-center text-slate-400 py-16 bg-slate-50 dark:bg-slate-800 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
+                <div className="text-center text-slate-400 py-16 bg-white dark:bg-slate-900 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 shadow-sm">
                   <MessageSquare size={48} className="mx-auto mb-4 text-slate-300 dark:text-slate-600" />
                   <p>No comments yet. Be the first to start a discussion.</p>
                 </div>

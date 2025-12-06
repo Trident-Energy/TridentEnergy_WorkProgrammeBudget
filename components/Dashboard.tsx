@@ -67,7 +67,14 @@ export const Dashboard = () => {
 
   // 1. Permission Based Filtering
   const accessibleProjects = projects.filter(p => {
-    if (currentUser.role === Role.Admin || currentUser.role === Role.CEO) return true;
+    if (currentUser.role === Role.Admin) return true;
+    
+    // CEO Filter: Only show contracts pending CEO approval or already approved by CEO
+    if (currentUser.role === Role.CEO) {
+      return p.status === Status.CMApproved || p.status === Status.CEOApproved;
+    }
+
+    // Default: Filter by country for Regional roles
     return p.country === currentUser.country;
   });
 

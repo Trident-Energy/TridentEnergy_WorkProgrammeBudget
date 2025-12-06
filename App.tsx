@@ -6,6 +6,7 @@ import { Dashboard } from './components/Dashboard';
 import { ProjectForm } from './components/ProjectForm';
 import { BusinessOverview } from './components/BusinessOverview';
 import { AdminPage } from './components/AdminPage';
+import { UserGuide } from './components/UserGuide';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/overview" element={<BusinessOverview />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/guide" element={<UserGuide />} />
             <Route path="/new" element={<ProjectForm />} />
             <Route path="/project/:id" element={<ProjectForm />} />
             <Route path="*" element={<Navigate to="/" replace />} />
