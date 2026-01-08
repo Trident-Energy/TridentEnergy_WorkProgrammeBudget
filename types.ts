@@ -1,7 +1,7 @@
+
 export enum Role {
   ProjectLead = 'Project Lead',
   CountryManager = 'Country Manager',
-  CEO = 'CEO',
   Admin = 'Admin'
 }
 
@@ -15,32 +15,15 @@ export enum Status {
   Draft = 'Draft',
   Submitted = 'Submitted',
   CMApproved = 'Country Manager Approved',
-  CEOApproved = 'CEO Approved',
+  HQApproved = 'Approved by HQ',
   Revision = 'Returned for Revision',
   Rejected = 'Rejected'
 }
 
 export enum ExpenseType {
   CAPEX = 'CAPEX',
-  OPEX = 'OPEX',
-  MIX = 'MIX OPEX/CAPEX'
-}
-
-export enum Category {
-  WellServices = 'Well services',
-  TopsideProject = 'Topside Project',
-  Maintenance = 'Maintenance',
-  MarineStructure = 'Marine and Structure',
-  AutomationControls = 'Automation & Controls',
-  Decommissioning = 'Decommissioning',
-  SubseaProjects = 'Subsea Projects',
-  Geoscience = 'Geoscience',
-  Integrity = 'Integrity',
-  WellIntegrity = 'Well Integrity',
-  SpecialProjects = 'Special Projects',
-  Drilling = 'Drilling',
-  Studies = 'Studies',
-  Other = 'Other'
+  SOPEX = 'SOPEX',
+  ABEX = 'ABEX'
 }
 
 export interface User {
@@ -102,9 +85,10 @@ export interface Project {
   startDate: string;
   endDate: string;
   concession: string;
-  category: Category;
+  category: string; 
   subcategory?: string;
-  priority: number; // 1-5
+  projectClass: string; 
+  priority: string; 
   owner: string;
   reviewers: string[];
   additionalReserves: boolean;
@@ -115,7 +99,7 @@ export interface Project {
   description: string;
   justification: string;
 
-  // Planning
+  // Planning (displayed in Finance tab)
   planEngineering: PlanningRow;
   planProcurement: PlanningRow;
   planExecution: PlanningRow;
@@ -123,8 +107,21 @@ export interface Project {
   // Finance
   initiatedBefore: boolean;
   prevBudgetRef: string;
-  afeNavRef: string;
+  afeNumber?: string;
+  estimateClass?: string;
   expenditures: FinanceSchedule;
+
+  // Production & Economics (Visible when additionalReserves is true)
+  oilPriceScenario?: string;
+  expectedFirstOilDate?: string;
+  grossInvestment?: string;
+  grossReserves?: string;
+  netNPV10?: string;
+  netInvestmentPerBoe?: string;
+  netNpvPerInvestment?: string;
+  netIRR?: string;
+  paybackMonths?: string;
+  breakevenOilPrice?: string;
 
   // Previous Budget (if applicable)
   prevTotalCost: number;
@@ -137,4 +134,20 @@ export interface Project {
   auditTrail: AuditLog[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface GlobalSettings {
+  activeBudgetYear: number;
+  isReadOnly: boolean;
+  systemMessage: string;
+  lockDates: Record<string, string | null>;
+  thresholds: {
+    ceoApprovalLimit: number;
+  };
+}
+
+export interface MasterData {
+  categories: string[];
+  subcategories: string[];
+  concessions: Record<string, string[]>;
 }

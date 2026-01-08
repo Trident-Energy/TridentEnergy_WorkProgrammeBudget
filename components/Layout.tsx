@@ -2,11 +2,11 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Role } from '../types';
-import { LayoutDashboard, PlusCircle, PieChart, Moon, Sun, Settings, BookOpen, Database } from 'lucide-react';
+import { LayoutDashboard, PieChart, Moon, Sun, Settings, BookOpen, Database, AlertTriangle } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { currentUser, switchUser, users, theme, toggleTheme } = useApp();
+  const { currentUser, switchUser, users, theme, toggleTheme, settings } = useApp();
   const location = useLocation();
 
   // Updated active state to match the new brand background color for better contrast/blending
@@ -14,6 +14,15 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   return (
     <div className="flex flex-col h-screen bg-slate-100 dark:bg-slate-950 overflow-hidden print:h-auto print:overflow-visible transition-colors duration-200">
+      
+      {/* Global Announcement Banner */}
+      {settings.systemMessage && (
+        <div className="bg-amber-500 text-white px-4 py-2 text-sm font-bold text-center shadow-md z-40 flex items-center justify-center gap-2 animate-in slide-in-from-top-full duration-300">
+          <AlertTriangle size={16} className="fill-white text-amber-500" />
+          {settings.systemMessage}
+        </div>
+      )}
+
       {/* Top Header Wrapper - Brand Background */}
       <div className="bg-brand text-white z-30 shrink-0 no-print shadow-md flex flex-col">
         
@@ -42,15 +51,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-
-            {/* New Project Button */}
-            <Link 
-              to="/new" 
-              className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-md transition-all shadow-md hover:shadow-lg text-sm font-bold border border-blue-500"
-            >
-              <PlusCircle size={18} />
-              <span>New Project</span>
-            </Link>
 
             {/* User Control Panel */}
             <div className="flex items-center gap-6 pl-4 border-l border-[#3e5d7c]">
@@ -120,8 +120,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
              location.pathname === '/guide' ? 'Deployment & Training Guide' :
              location.pathname === '/new' ? 'New Project' : 'Project Detail'}
           </h1>
-          <div className="text-sm text-slate-500 dark:text-slate-400">
-             Budget Cycle
+          <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+             Active Budget Cycle: <span className="text-blue-600 dark:text-blue-400">{settings.activeBudgetYear}</span>
           </div>
       </header>
 

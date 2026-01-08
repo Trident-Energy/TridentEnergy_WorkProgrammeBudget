@@ -1,300 +1,288 @@
 import React, { useState } from 'react';
-import { Book, Users, LayoutDashboard, FileText, CheckCircle, TrendingUp, ChevronRight, Menu, HelpCircle, AlertTriangle, Wallet, Calendar } from 'lucide-react';
-import { STATUS_COLORS } from '../constants';
+// Fix: Added missing HelpCircle import from lucide-react
+import { BookOpen, Shield, Send, Table, Info, Layers, CheckCircle, AlertTriangle, User, Globe, DollarSign, Calendar, ChevronRight, HelpCircle } from 'lucide-react';
 
-export const UserGuide = () => {
-    const [activeSection, setActiveSection] = useState('intro');
+export const UserGuide: React.FC = () => {
+  const [activeSection, setActiveSection] = useState('intro');
 
-    const scrollTo = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-            setActiveSection(id);
-        }
-    };
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setActiveSection(id);
+    }
+  };
 
-    const NavButton = ({ id, label }: { id: string, label: string }) => (
-        <button 
-            onClick={() => scrollTo(id)} 
-            className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${activeSection === id ? 'bg-blue-50 text-blue-700 font-bold dark:bg-blue-900/20 dark:text-blue-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-        >
-            {label}
-        </button>
-    );
+  const menuItems = [
+    { id: 'intro', label: 'Introduction', icon: Info },
+    { id: 'roles', label: 'Roles & Permissions', icon: Shield },
+    { id: 'workflow', label: 'Governance Workflow', icon: Send },
+    { id: 'creation', label: 'Project Lifecycle', icon: Layers },
+    { id: 'estimates', label: 'Estimate Classes', icon: Table },
+    { id: 'support', label: 'Support & FAQs', icon: BookOpen },
+  ];
 
-    return (
-        <div className="flex gap-8 max-w-7xl items-start pb-20">
-           {/* Sidebar Navigation */}
-           <div className="hidden lg:block w-64 sticky top-6 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden shrink-0">
-              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                 <h3 className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                    <Book size={18} className="text-blue-600"/> Table of Contents
-                 </h3>
-              </div>
-              <nav className="p-2 space-y-1">
-                 <NavButton id="intro" label="Introduction" />
-                 <NavButton id="roles" label="User Roles & Permissions" />
-                 <NavButton id="dashboard" label="Navigating the Dashboard" />
-                 <NavButton id="project-mgmt" label="Project Management" />
-                 <NavButton id="finance" label="Financial Planning" />
-                 <NavButton id="workflow" label="Approval Workflow" />
-                 <NavButton id="reports" label="Business Intelligence" />
-              </nav>
-           </div>
-
-           {/* Content Area */}
-           <div className="flex-1 space-y-12 min-w-0">
-              
-              {/* Introduction */}
-              <section id="intro" className="scroll-mt-6">
-                  <div className="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                      <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-4">Work Plan & Budget User Guide</h1>
-                      <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-                          Welcome to the Trident Energy Work Plan & Budget (WPB) application. This comprehensive tool is designed to streamline the capital project budgeting process across our subsidiaries (Brazil, Equatorial Guinea, Congo). It ensures consistent data collection, provides rigorous approval workflows, and offers real-time financial insights for effective decision-making.
-                      </p>
-                      <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-lg border-l-4 border-blue-500">
-                          <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
-                              <HelpCircle size={18} /> Training Objectives
-                          </h4>
-                          <ul className="list-disc list-inside text-sm text-blue-700 dark:text-blue-400 space-y-1 ml-1">
-                              <li>Understand user roles and access rights.</li>
-                              <li>Learn how to create, edit, and submit project proposals.</li>
-                              <li>Master the financial scheduling inputs for OPEX and CAPEX.</li>
-                              <li>Navigate the approval workflow from submission to CEO sign-off.</li>
-                          </ul>
-                      </div>
-                  </div>
-              </section>
-
-              {/* Roles */}
-              <section id="roles" className="scroll-mt-6">
-                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-                    <Users className="text-purple-600" /> User Roles & Permissions
-                 </h2>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded dark:bg-blue-900/30 dark:text-blue-300">Project Lead</span>
-                        </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">The primary owner of project data and execution.</p>
-                        <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Create new projects and input technical details.</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Define financial schedules (Q1-Q4).</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Submit projects for approval.</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Revise projects based on management feedback.</li>
-                        </ul>
-                    </div>
-                    
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="bg-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded dark:bg-orange-900/30 dark:text-orange-300">Country Manager</span>
-                        </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Responsible for regional budget validation and strategy.</p>
-                        <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> View all projects within their country.</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Approve submitted projects (Level 1 Approval).</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Request changes or reject proposals with comments.</li>
-                        </ul>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded dark:bg-purple-900/30 dark:text-purple-300">CEO</span>
-                        </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Final authority on corporate budget allocation.</p>
-                        <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> View projects across all regions globally.</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Give final approval (Level 2 Approval).</li>
-                        </ul>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                         <div className="flex items-center gap-2 mb-3">
-                            <span className="bg-slate-800 text-white text-xs font-bold px-2 py-1 rounded dark:bg-slate-700">Admin</span>
-                        </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">System maintenance and user management.</p>
-                        <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Add or remove users from the system.</li>
-                            <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5"/> Update user roles and country assignments.</li>
-                        </ul>
-                    </div>
-                 </div>
-              </section>
-
-              {/* Dashboard */}
-              <section id="dashboard" className="scroll-mt-6">
-                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-                    <LayoutDashboard className="text-blue-500" /> Navigating the Dashboard
-                 </h2>
-                 <div className="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
-                    <p>
-                        The Dashboard is your central hub. It displays a list of all projects you have access to. 
-                        By default, you see projects for the upcoming budget year.
-                    </p>
-                    <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700">
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Filtering</h4>
-                            <p className="text-sm">Use the top bar to filter by <strong>Location</strong> (BR, GQ, CG), <strong>Budget Year</strong>, or <strong>Category</strong>. The Search bar allows you to find specific projects by code, name, or owner.</p>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700">
-                             <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Quick Stats</h4>
-                            <p className="text-sm">The table shows the <strong>Total Cost</strong> (lifecycle cost) and the <strong>Budget Year Cost</strong> (specific to the selected year) for quick financial assessment.</p>
-                        </div>
-                    </div>
-                 </div>
-              </section>
-
-               {/* Project Management */}
-               <section id="project-mgmt" className="scroll-mt-6">
-                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-                    <FileText className="text-orange-500" /> Project Management
-                 </h2>
-                 <div className="space-y-6">
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-4">1. Creating a New Project</h3>
-                        <p className="text-slate-600 dark:text-slate-300 mb-4 text-sm">
-                            Click the <span className="font-bold bg-blue-600 text-white px-2 py-0.5 rounded text-xs">New Project</span> button in the header. 
-                            The form is divided into several tabs:
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                             <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
-                                 <strong className="block mb-1 text-slate-800 dark:text-slate-200">Details Tab</strong>
-                                 Basic info like Country, Name, Dates, and Categories. The Project Code is auto-generated based on the start date.
-                             </div>
-                             <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
-                                 <strong className="block mb-1 text-slate-800 dark:text-slate-200">Planning Tab</strong>
-                                 Checkboxes to indicate active quarters for Engineering, Procurement, and Execution phases.
-                             </div>
-                             <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
-                                 <strong className="block mb-1 text-slate-800 dark:text-slate-200">Finance Tab</strong>
-                                 Detailed cost breakdown. See "Financial Planning" below.
-                             </div>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
-                        <AlertTriangle className="text-amber-600 shrink-0 mt-0.5" size={20} />
-                        <div>
-                            <h4 className="font-bold text-amber-800 dark:text-amber-300 text-sm">Audit Trail</h4>
-                            <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                                Every change made to a project is recorded in the <strong>Audit Trail</strong> tab. This ensures full transparency of who changed what and when, including status changes and financial updates.
-                            </p>
-                        </div>
-                    </div>
-                 </div>
-              </section>
-
-               {/* Finance */}
-               <section id="finance" className="scroll-mt-6">
-                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-                    <Wallet className="text-green-600" /> Financial Planning
-                 </h2>
-                 <p className="text-slate-600 dark:text-slate-300 mb-6">
-                     Accurate financial forecasting is critical. Values are entered in <strong>kUSD (thousands of US Dollars)</strong>.
-                 </p>
-                 <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-bold">
-                            <tr>
-                                <th className="px-4 py-3">Field</th>
-                                <th className="px-4 py-3">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
-                            <tr>
-                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Prior Years</td>
-                                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">Total expenditure incurred before the current reporting year.</td>
-                            </tr>
-                            <tr>
-                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Current Year</td>
-                                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">Forecast for the year immediately preceding the Budget Year.</td>
-                            </tr>
-                            <tr className="bg-blue-50 dark:bg-blue-900/10">
-                                <td className="px-4 py-3 font-semibold text-blue-800 dark:text-blue-300">Q1 - Q4</td>
-                                <td className="px-4 py-3 text-blue-700 dark:text-blue-400 font-medium">Detailed breakdown for the Budget Year. This is the primary focus of the WPB cycle.</td>
-                            </tr>
-                            <tr>
-                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Year +1 to +4</td>
-                                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">Long-term outlook for multi-year projects.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                 </div>
-              </section>
-
-               {/* Workflow */}
-              <section id="workflow" className="scroll-mt-6">
-                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-                    <CheckCircle className="text-emerald-600" /> Approval Workflow
-                 </h2>
-                 <div className="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative mb-8">
-                        {/* Visual Workflow Steps */}
-                        <div className="flex-1 w-full text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg relative z-10 border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center mx-auto mb-2">1</div>
-                            <div className="font-bold text-slate-800 dark:text-slate-200 text-sm">Draft</div>
-                            <p className="text-xs text-slate-500 mt-1">Project Lead inputs data. Project is editable.</p>
-                        </div>
-                        <ChevronRight className="text-slate-300 hidden md:block" />
-                        <div className="flex-1 w-full text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg relative z-10 border border-blue-200 dark:border-blue-800 shadow-sm">
-                            <div className="w-8 h-8 rounded-full bg-blue-200 dark:bg-blue-800 text-blue-700 dark:text-blue-200 font-bold flex items-center justify-center mx-auto mb-2">2</div>
-                            <div className="font-bold text-blue-800 dark:text-blue-300 text-sm">Submitted</div>
-                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Locked. Waiting for Country Manager.</p>
-                        </div>
-                        <ChevronRight className="text-slate-300 hidden md:block" />
-                        <div className="flex-1 w-full text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg relative z-10 border border-purple-200 dark:border-purple-800 shadow-sm">
-                            <div className="w-8 h-8 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-200 font-bold flex items-center justify-center mx-auto mb-2">3</div>
-                            <div className="font-bold text-purple-800 dark:text-purple-300 text-sm">CM Approved</div>
-                            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Regional validation complete. Waiting for CEO.</p>
-                        </div>
-                        <ChevronRight className="text-slate-300 hidden md:block" />
-                        <div className="flex-1 w-full text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg relative z-10 border border-green-200 dark:border-green-800 shadow-sm">
-                            <div className="w-8 h-8 rounded-full bg-green-200 dark:bg-green-800 text-green-700 dark:text-green-200 font-bold flex items-center justify-center mx-auto mb-2">4</div>
-                            <div className="font-bold text-green-800 dark:text-green-300 text-sm">CEO Approved</div>
-                            <p className="text-xs text-green-600 dark:text-green-400 mt-1">Final Budget Approval.</p>
-                        </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600 dark:text-slate-400">
-                        <div className="p-4 rounded bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30">
-                            <strong className="text-red-700 dark:text-red-400">Rejection:</strong> If a project is Rejected at any stage, it is marked as closed. A new project must be created if the idea is to be resubmitted.
-                        </div>
-                        <div className="p-4 rounded bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30">
-                             <strong className="text-amber-700 dark:text-amber-400">Requests for Change:</strong> The project returns to "Revision" status. The Project Lead can edit and re-submit without creating a new entry.
-                        </div>
-                    </div>
-                 </div>
-              </section>
-
-               {/* BI Reports */}
-               <section id="reports" className="scroll-mt-6">
-                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-                    <TrendingUp className="text-red-500" /> Business Intelligence
-                 </h2>
-                 <p className="text-slate-600 dark:text-slate-300 mb-4">
-                     The <strong className="text-slate-800 dark:text-slate-200">Business Overview</strong> page provides aggregate analytics for the entire portfolio.
-                 </p>
-                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                     <li className="bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 rounded shadow-sm">
-                         <strong className="block mb-1 text-slate-800 dark:text-slate-200">Value at Risk</strong>
-                         Visualizes the maturity of the budget (Draft vs Pending vs Approved) to highlight bottlenecks.
-                     </li>
-                     <li className="bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 rounded shadow-sm">
-                         <strong className="block mb-1 text-slate-800 dark:text-slate-200">CAPEX vs OPEX</strong>
-                         Quarterly breakdown of expenditure types to ensure balanced spending profiles.
-                     </li>
-                     <li className="bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 rounded shadow-sm">
-                         <strong className="block mb-1 text-slate-800 dark:text-slate-200">Regional Split</strong>
-                         Donut charts showing the distribution of funds between BR, GQ, and CG.
-                     </li>
-                     <li className="bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 rounded shadow-sm">
-                         <strong className="block mb-1 text-slate-800 dark:text-slate-200">Big Ticket Projects</strong>
-                         A ranked list of the top 5 costliest projects for high-level management review.
-                     </li>
-                 </ul>
-              </section>
-
-           </div>
+  return (
+    <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto pb-20 relative">
+      {/* --- STICKY SIDEBAR MENU --- */}
+      <aside className="lg:w-64 shrink-0 no-print">
+        <div className="sticky top-24 space-y-1">
+          <div className="px-4 py-3 mb-2">
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Documentation</h3>
+          </div>
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-lg transition-all ${
+                activeSection === item.id
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-none translate-x-1'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
+              }`}
+            >
+              <item.icon size={18} />
+              {item.label}
+            </button>
+          ))}
         </div>
-    );
+      </aside>
+
+      {/* --- MAIN CONTENT AREA --- */}
+      <div className="flex-1 space-y-20">
+        {/* Introduction */}
+        <section id="intro" className="scroll-mt-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="mb-8 border-b border-slate-200 dark:border-slate-800 pb-8">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white flex items-center gap-4">
+              <BookOpen size={40} className="text-blue-600" />
+              WP&B User Guide
+            </h1>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
+              Welcome to the Work Plan & Budget (WP&B) Platform. This comprehensive guide is designed to help you navigate the end-to-end process of project budgeting, approval, and governance.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
+              <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-2">Purpose</h3>
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                Streamline budget planning across Brazil, Equatorial Guinea, and Congo subsidiaries while ensuring strict financial governance and auditability.
+              </p>
+            </div>
+            <div className="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
+              <h3 className="font-bold text-emerald-900 dark:text-emerald-300 mb-2">Key Features</h3>
+              <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-1 list-disc pl-4">
+                <li>Automated Project Code Generation</li>
+                <li>Multi-year Financial Forecasting</li>
+                <li>Real-time Governance Discussion</li>
+                <li>Comprehensive Audit Trails</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Roles & Permissions */}
+        <section id="roles" className="scroll-mt-24 space-y-6">
+          <div className="flex items-center gap-3 border-l-4 border-blue-600 pl-4 py-1">
+            <Shield size={24} className="text-blue-600" />
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Roles & Permissions</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { role: 'Project Lead', icon: User, items: ['Create/Edit Drafts', 'Submit for Review', 'Duplicate for New Year'] },
+              { role: 'Country Manager', icon: Globe, items: ['Review Submissions', 'Approve/Reject locally', 'Request Revisions'] },
+              { role: 'HQ / Admin', icon: Shield, items: ['Final HQ Approval', 'System Configuration', 'User Management'] },
+            ].map((item) => (
+              <div key={item.role} className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center mb-4">
+                  <item.icon size={24} className="text-blue-600" />
+                </div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-4 uppercase tracking-wider text-sm">{item.role}</h3>
+                <ul className="space-y-3">
+                  {item.items.map((li) => (
+                    <li key={li} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                      <CheckCircle size={14} className="text-emerald-500" /> {li}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Governance Workflow */}
+        <section id="workflow" className="scroll-mt-24 space-y-8">
+          <div className="flex items-center gap-3 border-l-4 border-blue-600 pl-4 py-1">
+            <Send size={24} className="text-blue-600" />
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Governance Workflow</h2>
+          </div>
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto mb-10">
+              <div className="flex flex-col items-center gap-2 w-full md:w-32">
+                <div className="w-full text-center py-2 px-4 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase">Draft</div>
+                <p className="text-[10px] text-slate-400 text-center">Project Lead</p>
+              </div>
+              <ChevronRight className="rotate-90 md:rotate-0 text-slate-300" />
+              <div className="flex flex-col items-center gap-2 w-full md:w-32">
+                <div className="w-full text-center py-2 px-4 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded border border-blue-200 text-[10px] font-black uppercase">Submitted</div>
+                <p className="text-[10px] text-slate-400 text-center">Pending Review</p>
+              </div>
+              <ChevronRight className="rotate-90 md:rotate-0 text-slate-300" />
+              <div className="flex flex-col items-center gap-2 w-full md:w-32">
+                <div className="w-full text-center py-2 px-4 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded border border-indigo-200 text-[10px] font-black uppercase">CM Approved</div>
+                <p className="text-[10px] text-slate-400 text-center">Sub. Review</p>
+              </div>
+              <ChevronRight className="rotate-90 md:rotate-0 text-slate-300" />
+              <div className="flex flex-col items-center gap-2 w-full md:w-32">
+                <div className="w-full text-center py-2 px-4 bg-emerald-600 text-white rounded border border-emerald-700 shadow-lg shadow-emerald-100 text-[10px] font-black uppercase">HQ Approved</div>
+                <p className="text-[10px] text-slate-400 text-center">Final Approval</p>
+              </div>
+            </div>
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-900/30 flex gap-4">
+              <AlertTriangle className="text-amber-500 shrink-0" size={20} />
+              <div className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
+                <strong>Threshold Rule:</strong> Projects with a Total Project Cost below the HQ Threshold (currently set by Admin) are automatically transitioned to "Approved by HQ" upon Country Manager approval.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Project Lifecycle */}
+        <section id="creation" className="scroll-mt-24 space-y-6">
+          <div className="flex items-center gap-3 border-l-4 border-blue-600 pl-4 py-1">
+            <Layers size={24} className="text-blue-600" />
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Project Lifecycle Management</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-1">Creation & Identification</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Fill in mandatory fields. Project codes are automatically generated based on Country and Year to ensure uniqueness and categorization.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-1">Financial Scheduling</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Map your project expenditures across 4 quarters. The system calculates the 'Total Project Cost' automatically to aid governance.</p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">3</div>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-1">Governance & Communication</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Use the 'Approval' tab to engage in discussions with reviewers. All comments are logged and stored with the project record.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">4</div>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-1">Carry Over (Duplication)</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Carry over active projects to the next budget year with a single click. Previous spend is migrated to the 'Prior Years' bucket.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Estimate Classes */}
+        <section id="estimates" className="scroll-mt-24 space-y-8">
+          <div className="flex items-center gap-3 border-l-4 border-blue-600 pl-4 py-1">
+            <Table size={24} className="text-blue-600" />
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">AACE International Estimate Classes</h2>
+          </div>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+              <p className="text-xs text-slate-500 italic">Reference: Cost Estimate Classification System — As Applied in Engineering, Procurement, and Construction for the Process Industries (AACE International).</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-[11px] text-left border-collapse">
+                <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b dark:border-slate-700">
+                  <tr>
+                    <th rowSpan={2} className="px-4 py-3 border-r dark:border-slate-700 w-24">Estimate Class</th>
+                    <th className="px-4 py-3 border-b border-r dark:border-slate-700 text-center bg-blue-50/30 dark:bg-blue-900/20">Primary Characteristic</th>
+                    <th colSpan={4} className="px-4 py-3 text-center bg-slate-100/50 dark:bg-slate-800/50">Secondary Characteristics</th>
+                  </tr>
+                  <tr>
+                    <th className="px-4 py-3 border-r dark:border-slate-700 text-center">Level of Project Definition (% of complete definition)</th>
+                    <th className="px-4 py-3 border-r dark:border-slate-700 text-center">End Usage (Typical purpose)</th>
+                    <th className="px-4 py-3 border-r dark:border-slate-700 text-center">Methodology (Typical method)</th>
+                    <th className="px-4 py-3 border-r dark:border-slate-700 text-center">Expected Accuracy Range (Variation low/high)</th>
+                    <th className="px-4 py-3 text-center">Preparation Effort (Relative to index 1)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                    <td className="px-4 py-4 border-r dark:border-slate-700 font-black text-slate-800 dark:text-slate-100 bg-slate-50/20">Class 5</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 text-center">0% to 2%</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Concept Screening</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Capacity Factored, Parametric Models, Judgment, or Analogy</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 bg-red-50/20 dark:bg-red-900/10">L: -20% to -50%<br/>H: +30% to +100%</td>
+                    <td className="px-4 py-4 text-center">1</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                    <td className="px-4 py-4 border-r dark:border-slate-700 font-black text-slate-800 dark:text-slate-100 bg-slate-50/20">Class 4</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 text-center">1% to 15%</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Study or Feasibility</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Equipment Factored or Parametric Models</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 bg-orange-50/20 dark:bg-orange-900/10">L: -15% to -30%<br/>H: +20% to +50%</td>
+                    <td className="px-4 py-4 text-center">2 to 4</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                    <td className="px-4 py-4 border-r dark:border-slate-700 font-black text-slate-800 dark:text-slate-100 bg-slate-50/20">Class 3</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 text-center">10% to 40%</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Budget, Authorization, or Control</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Semi-Detailed Unit Costs with Assembly Level Line Items</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 bg-amber-50/20 dark:bg-amber-900/10">L: -10% to -20%<br/>H: +10% to +30%</td>
+                    <td className="px-4 py-4 text-center">3 to 10</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                    <td className="px-4 py-4 border-r dark:border-slate-700 font-black text-slate-800 dark:text-slate-100 bg-slate-50/20">Class 2</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 text-center">30% to 70%</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Control or Bid/Tender</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Detailed Unit Cost with Forced Detailed Take-Off</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 bg-blue-50/20 dark:bg-blue-900/10">L: -5% to -15%<br/>H: +5% to +20%</td>
+                    <td className="px-4 py-4 text-center">4 to 20</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                    <td className="px-4 py-4 border-r dark:border-slate-700 font-black text-slate-800 dark:text-slate-100 bg-slate-50/20">Class 1</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 text-center">50% to 100%</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Check Estimate or Bid/Tender</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700">Detailed Unit Cost with Detailed Take-Off</td>
+                    <td className="px-4 py-4 border-r dark:border-slate-700 bg-emerald-50/20 dark:bg-emerald-900/10">L: -3% to -10%<br/>H: +3% to +15%</td>
+                    <td className="px-4 py-4 text-center">5 to 100</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* Support & FAQs */}
+        <section id="support" className="scroll-mt-24 space-y-6">
+          <div className="flex items-center gap-3 border-l-4 border-blue-600 pl-4 py-1">
+            <HelpCircle size={24} className="text-blue-600" />
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Support & FAQs</h2>
+          </div>
+          <div className="space-y-4">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+              <h4 className="font-bold text-slate-800 dark:text-white mb-2 italic">Why is my project code locked?</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400">By default, codes are immutable to prevent broken links in historical reporting. Admins can override this in cases of critical typo correction.</p>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+              <h4 className="font-bold text-slate-800 dark:text-white mb-2 italic">What happens if a project is rejected?</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Rejected projects are locked for editing. If you need to resubmit, duplicate the project to start a new iteration based on the feedback received.</p>
+            </div>
+          </div>
+          <div className="mt-8 p-6 bg-slate-800 rounded-xl text-white text-center">
+            <p className="font-bold mb-2">Need Further Assistance?</p>
+            <p className="text-xs text-slate-400 mb-6">Contact the Group Financial Planning & Analysis (FP&A) team via MS Teams or Email.</p>
+            <button className="px-6 py-2 bg-blue-600 rounded-md font-bold text-sm hover:bg-blue-700 transition-colors">Submit Support Ticket</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 };
